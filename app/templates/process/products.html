@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}产品管理{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>产品管理</h2>
+    <a href="{{ url_for('process.new_product') }}" class="btn btn-primary">
+        <i class="bi bi-plus"></i> 新建产品
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>编码</th>
+                        <th>名称</th>
+                        <th>单位</th>
+                        <th>工序数</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr>
+                        <td>{{ product.code }}</td>
+                        <td>{{ product.name }}</td>
+                        <td>{{ product.unit }}</td>
+                        <td>{{ product.processes|length }}</td>
+                        <td>{{ product.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td>
+                            <a href="{{ url_for('process.product_detail', id=product.id) }}" class="btn btn-sm btn-primary">
+                                查看
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

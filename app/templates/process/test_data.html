@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}测试数据{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>测试数据列表</h2>
+        <a href="{{ url_for('process.upload_test_data') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> 上传测试数据
+        </a>
+    </div>
+
+    <!-- 过滤器 -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-2">
+                    <label for="order_id" class="form-label">生产订单</label>
+                    <select class="form-select" id="order_id" name="order_id">
+                        <option value="">全部</option>
+                        {% for order in orders %}
+                        <option value="{{ order.id }}" {% if request.args.get('order_id')|int == order.id %}selected{% endif %}>
+                            {{ order.order_number }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="process_id" class="form-label">工序</label>
+                    <select class="form-select" id="process_id" name="process_id">
+                        <option value="">全部</option>
+                        {% for process in processes %}
+                        <option value="{{ process.id }}" {% if request.args.get('process_id')|int == process.id %}selected{% endif %}>
+                            {{ process.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="test_result" class="form-label">测试结果</label>
+                    <select class="form-select" id="test_result" name="test_result">
+                        <option value="">全部</option>
+                        <option value="合格" {% if request.args.get('test_result') == '合格' %}selected{% endif %}>合格</option>
+                        <option value="不合格" {% if request.args.get('test_result') == '不合格' %}selected{% endif %}>不合格</option>
+                        <option value="警告" {% if request.args.get('test_result') == '警告' %}selected{% endif %}>警告</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="start_date" class="form-label">开始日期</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date" 
+                           value="{{ request.args.get('start_date', '') }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="end_date" class="form-label">结束日期</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date"
+                           value="{{ request.args.get('end_date', '') }}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">筛选</button>
+                    <a href="{{ url_for('process.test_data') }}" class="btn btn-secondary">重置</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 测试数据表格 -->
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>订单编号</th>
+                            <th>工序</th>
+                            <th>序列号(SN)</th>
+                            <th>测试项目</th>
+                            <th>测试值</th>
+                            <th>测试结果</th>
+                            <th>测试时间</th>
+                            <th>测试人员</th>
+                            <th>设备编号</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for data in test_data %}
+                        <tr>
+                            <td>{{ data.order.order_number }}</td>
+                            <td>{{ data.process.name }}</td>
+                            <td>{{ data.sn }}</td>
+                            <td>{{ data.test_item }}</td>
+                            <td>{{ data.test_value }}</td>
+                            <td>
+                                <span class="badge {% if data.test_result == '合格' %}bg-success{% elif data.test_result == '不合格' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ data.test_result }}
+                                </span>
+                            </td>
+                            <td>{{ data.test_time.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>{{ data.tester }}</td>
+                            <td>{{ data.equipment_code or '-' }}</td>
+                            <td>{{ data.remarks or '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            {% if pagination.pages > 1 %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('process.test_data', page=pagination.prev_num, **request.args) if pagination.has_prev else '#' }}">上一页</a>
+                    </li>
+                    {% for page in pagination.iter_pages() %}
+                        {% if page %}
+                            <li class="page-item {% if page == pagination.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('process.test_data', page=page, **request.args) }}">{{ page }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+                        <a class="page-link" href="{{ url_for('process.test_data', page=pagination.next_num, **request.args) if pagination.has_next else '#' }}">下一页</a>
+                    </li>
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

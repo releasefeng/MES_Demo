@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}添加工序{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">添加工序 - {{ product.name }}</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">工序名称</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">工序描述</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sequence" class="form-label">序号</label>
+                        <input type="number" class="form-control" id="sequence" name="sequence" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="standard_time" class="form-label">标准工时(分钟)</label>
+                        <input type="number" class="form-control" id="standard_time" name="standard_time" min="0" step="0.1">
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">添加工序</button>
+                        <a href="{{ url_for('process.product_detail', id=product.id) }}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

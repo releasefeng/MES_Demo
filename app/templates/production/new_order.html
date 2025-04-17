@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}新建生产订单{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">新建生产订单</h4>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div class="mb-3">
+                        <label for="product_id" class="form-label">产品</label>
+                        <select class="form-select" id="product_id" name="product_id" required>
+                            <option value="">请选择产品</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }} ({{ product.code }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="quantity" class="form-label">数量</label>
+                        <input type="number" class="form-control" id="quantity" name="quantity" min="1" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="start_date" class="form-label">计划开始日期</label>
+                        <input type="date" class="form-control" id="start_date" name="start_date" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">创建订单</button>
+                        <a href="{{ url_for('production.orders') }}" class="btn btn-secondary">取消</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

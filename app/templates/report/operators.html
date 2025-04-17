@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}操作员工作量统计{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">操作员工作量统计</h4>
+                <div class="btn-group">
+                    <a href="{{ url_for('report.operator_report', period='month') }}" 
+                       class="btn btn-outline-primary {{ 'active' if period == 'month' }}">月度</a>
+                    <a href="{{ url_for('report.operator_report', period='quarter') }}"
+                       class="btn btn-outline-primary {{ 'active' if period == 'quarter' }}">季度</a>
+                    <a href="{{ url_for('report.operator_report', period='year') }}"
+                       class="btn btn-outline-primary {{ 'active' if period == 'year' }}">年度</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <h5>统计时间：{{ start_date.strftime('%Y-%m-%d') }} 至 {{ end_date.strftime('%Y-%m-%d') }}</h5>
+                    </div>
+                </div>
+                
+                <!-- 操作员工作量统计 -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5>工作量统计</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>操作员</th>
+                                        <th>任务数量</th>
+                                        <th>完成产品数</th>
+                                        <th>参与订单数</th>
+                                        <th>工作量分布</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% set max_task_count = namespace(value=0) %}
+                                    {% for stat in operator_stats %}
+                                        {% if stat.task_count > max_task_count.value %}
+                                            {% set max_task_count.value = stat.task_count %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% for stat in operator_stats %}
+                                    <tr>
+                                        <td>{{ stat.username }}</td>
+                                        <td>{{ stat.task_count }}</td>
+                                        <td>{{ stat.total_quantity }}</td>
+                                        <td>{{ stat.order_count }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                {% set percentage = (stat.task_count / max_task_count.value * 100) %}
+                                                <div class="progress-bar bg-primary"
+                                                     role="progressbar"
+                                                     style="width: {{ percentage }}%"
+                                                     aria-valuenow="{{ percentage }}"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">{{ "%.1f"|format(percentage) }}%</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 工序类型分布 -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>工序类型分布</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>操作员</th>
+                                        <th>工序名称</th>
+                                        <th>完成数量</th>
+                                        <th>占比</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stat in process_stats %}
+                                    <tr>
+                                        <td>{{ stat.username }}</td>
+                                        <td>{{ stat.name }}</td>
+                                        <td>{{ stat.count }}</td>
+                                        <td>
+                                            {% set user_total = namespace(value=0) %}
+                                            {% for s in process_stats if s.username == stat.username %}
+                                                {% set user_total.value = user_total.value + s.count %}
+                                            {% endfor %}
+                                            {{ "%.1f"|format(stat.count / user_total.value * 100) }}%
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// 这里可以添加图表相关的JavaScript代码
+</script>
+{% endblock %} 

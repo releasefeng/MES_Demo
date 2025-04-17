@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}首页{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h2>欢迎使用MES系统</h2>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 订单统计卡片 -->
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">总订单数</h5>
+                <h2 class="card-text">{{ total_orders }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-warning">
+            <div class="card-body">
+                <h5 class="card-title">待处理订单</h5>
+                <h2 class="card-text">{{ pending_orders }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-info">
+            <div class="card-body">
+                <h5 class="card-title">生产中订单</h5>
+                <h2 class="card-text">{{ in_progress_orders }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-4">
+        <div class="card text-white bg-success">
+            <div class="card-body">
+                <h5 class="card-title">已完成订单</h5>
+                <h2 class="card-text">{{ completed_orders }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 最近订单列表 -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">最近订单</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>产品</th>
+                                <th>数量</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                            <tr>
+                                <td>{{ order.order_number }}</td>
+                                <td>{{ order.product.name }}</td>
+                                <td>{{ order.quantity }}</td>
+                                <td>
+                                    {% if order.status == 'pending' %}
+                                    <span class="badge bg-warning">待处理</span>
+                                    {% elif order.status == 'in_progress' %}
+                                    <span class="badge bg-info">生产中</span>
+                                    {% elif order.status == 'completed' %}
+                                    <span class="badge bg-success">已完成</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('production.order_detail', id=order.id) }}" class="btn btn-sm btn-primary">
+                                        查看
+                                    </a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 我的任务 -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">我的任务</h5>
+            </div>
+            <div class="card-body">
+                {% if user_tasks %}
+                <div class="list-group">
+                    {% for task in user_tasks %}
+                    <a href="{{ url_for('production.order_detail', id=task.order_id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ task.process.name }}</h6>
+                            <small>{{ task.order.order_number }}</small>
+                        </div>
+                        <p class="mb-1">产品：{{ task.order.product.name }}</p>
+                        <small>进度：{{ task.quantity_completed }}/{{ task.order.quantity }}</small>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-muted">暂无任务</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

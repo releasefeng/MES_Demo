@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}生产效率分析{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">生产效率分析</h4>
+                <div class="btn-group">
+                    <a href="{{ url_for('report.efficiency_report', days=7) }}" 
+                       class="btn btn-outline-primary {{ 'active' if days == 7 }}">近7天</a>
+                    <a href="{{ url_for('report.efficiency_report', days=30) }}"
+                       class="btn btn-outline-primary {{ 'active' if days == 30 }}">近30天</a>
+                    <a href="{{ url_for('report.efficiency_report', days=90) }}"
+                       class="btn btn-outline-primary {{ 'active' if days == 90 }}">近90天</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <h5>统计时间：{{ start_date.strftime('%Y-%m-%d') }} 至 {{ end_date.strftime('%Y-%m-%d') }}</h5>
+                    </div>
+                </div>
+                
+                <!-- 工序效率分析 -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5>工序效率分析</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>工序名称</th>
+                                        <th>平均完成时间(小时)</th>
+                                        <th>完成数量</th>
+                                        <th>效率趋势</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stat in process_stats %}
+                                    <tr>
+                                        <td>{{ stat.name }}</td>
+                                        <td>{{ "%.2f"|format(stat.avg_time / 3600) }}</td>
+                                        <td>{{ stat.count }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                {% set efficiency = 100 - (stat.avg_time / 3600 / 8 * 100) %}
+                                                <div class="progress-bar {{ 'bg-success' if efficiency >= 70 else 'bg-warning' if efficiency >= 40 else 'bg-danger' }}"
+                                                     role="progressbar"
+                                                     style="width: {{ efficiency }}%"
+                                                     aria-valuenow="{{ efficiency }}"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">{{ "%.1f"|format(efficiency) }}%</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 产品生产周期分析 -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <h5>产品生产周期分析</h5>
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>产品名称</th>
+                                        <th>平均生产周期(天)</th>
+                                        <th>完成订单数</th>
+                                        <th>周期趋势</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cycle in product_cycle %}
+                                    <tr>
+                                        <td>{{ cycle.name }}</td>
+                                        <td>{{ "%.2f"|format(cycle.avg_cycle / 86400) }}</td>
+                                        <td>{{ cycle.count }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                {% set cycle_efficiency = 100 - (cycle.avg_cycle / 86400 / 7 * 100) %}
+                                                <div class="progress-bar {{ 'bg-success' if cycle_efficiency >= 70 else 'bg-warning' if cycle_efficiency >= 40 else 'bg-danger' }}"
+                                                     role="progressbar"
+                                                     style="width: {{ cycle_efficiency }}%"
+                                                     aria-valuenow="{{ cycle_efficiency }}"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">{{ "%.1f"|format(cycle_efficiency) }}%</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// 这里可以添加图表相关的JavaScript代码
+</script>
+{% endblock %} 

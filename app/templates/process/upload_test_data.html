@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}上传测试数据{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">上传测试数据</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('process.upload_test_data') }}">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="order_id" class="form-label">生产订单 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="order_id" name="order_id" required>
+                                    <option value="">请选择生产订单</option>
+                                    {% for order in orders %}
+                                    <option value="{{ order.id }}">{{ order.order_number }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="process_id" class="form-label">工序 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="process_id" name="process_id" required>
+                                    <option value="">请选择工序</option>
+                                    {% for process in processes %}
+                                    <option value="{{ process.id }}">{{ process.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="sn" class="form-label">序列号(SN) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="sn" name="sn" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="test_item" class="form-label">测试项目 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="test_item" name="test_item" required>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="test_value" class="form-label">测试值 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="test_value" name="test_value" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="test_result" class="form-label">测试结果 <span class="text-danger">*</span></label>
+                                <select class="form-select" id="test_result" name="test_result" required>
+                                    <option value="">请选择测试结果</option>
+                                    <option value="合格">合格</option>
+                                    <option value="不合格">不合格</option>
+                                    <option value="警告">警告</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="equipment_code" class="form-label">设备编号</label>
+                                <input type="text" class="form-control" id="equipment_code" name="equipment_code">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="remarks" class="form-label">备注</label>
+                                <textarea class="form-control" id="remarks" name="remarks" rows="3"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <a href="{{ url_for('process.test_data') }}" class="btn btn-secondary me-2">取消</a>
+                            <button type="submit" class="btn btn-primary">提交</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 添加表单验证
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+});
+</script>
+{% endblock %} 
